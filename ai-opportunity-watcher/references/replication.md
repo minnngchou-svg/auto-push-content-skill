@@ -12,6 +12,7 @@ That single command will:
 - create `config.json` from `config.example.json` when it does not already exist
 - install the `LinuxDoWatcher3H` and `LinuxDoReplyProcessor10M` scheduled tasks when `--install-tasks` is included
 - run `doctor.ps1` unless `--skip-doctor` is passed
+- configure the scheduled tasks so they do not start or continue on battery power
 
 Use `scripts\scaffold_watcher.py` only when you want the files without the extra bootstrap steps.
 
@@ -51,6 +52,11 @@ The bundled Windows tasks expect:
 
 - `LinuxDoWatcher3H`: every 3 hours from 14:10
 - `LinuxDoReplyProcessor10M`: every 10 minutes from 00:00
+- the task installer also keeps the default AC-only battery policy for both tasks
+
+## Proxy Safety
+
+The bundled launcher scripts clear common proxy environment variables before starting Python. This protects new installs from dead local proxy settings that would otherwise break HTTP requests.
 
 ## Supported Reply Commands
 

@@ -28,6 +28,7 @@ Use $ai-opportunity-watcher to install the watcher in the current workspace and 
 ```
 
 The installed skill will scaffold the watcher project, create `config.json` from the template when needed, and can set up the Windows scheduled tasks.
+The generated task launchers also clear common proxy environment variables before running, and the installer configures the tasks so they do not start or continue while the machine is on battery.
 
 ## Repository Layout
 

@@ -27,8 +27,8 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $watcherRunner = Join-Path $scriptDir "run_linux_do_watcher.ps1"
 $replyRunner = Join-Path $scriptDir "run_linux_do_reply_processor.ps1"
 
-schtasks /Create /SC HOURLY /MO $WatcherIntervalHours /ST $WatcherStartTime /TN $WatcherTaskName /TR "powershell -ExecutionPolicy Bypass -File `"$watcherRunner`"" /F | Out-Host
-schtasks /Create /SC MINUTE /MO $ReplyIntervalMinutes /ST 00:00 /TN $ReplyTaskName /TR "powershell -ExecutionPolicy Bypass -File `"$replyRunner`"" /F | Out-Host
+schtasks /Create /SC HOURLY /MO $WatcherIntervalHours /ST $WatcherStartTime /TN $WatcherTaskName /TR "powershell -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$watcherRunner`"" /F | Out-Host
+schtasks /Create /SC MINUTE /MO $ReplyIntervalMinutes /ST 00:00 /TN $ReplyTaskName /TR "powershell -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$replyRunner`"" /F | Out-Host
 Set-AcOnlyTaskSettings -TaskName $WatcherTaskName
 Set-AcOnlyTaskSettings -TaskName $ReplyTaskName
 

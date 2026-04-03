@@ -153,6 +153,7 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - 回复指令识别
 - 保存文章索引
 - 启动脚本自动清理坏掉的代理变量
+- 计划任务默认以隐藏窗口运行
 
 所以很多命令确实不是普通用户的必做项。
 

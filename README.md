@@ -101,6 +101,7 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-s
 - 生成健康检查脚本
 - 可选创建计划任务
 - 启动脚本自动清理坏掉的代理变量
+- 计划任务默认以隐藏窗口运行
 
 所以你说得对，很多命令并不需要普通用户手动做。
 

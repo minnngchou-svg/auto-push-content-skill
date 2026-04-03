@@ -2,9 +2,18 @@
 
 这个目录里的项目，才是真正会跑起来的 watcher。
 
-它会定时抓取多个站点的内容，筛选出和 AI 福利、试用、额度、邀请码相关的话题，然后发到邮箱。你还可以直接回复邮件，用序号保存文章、给内容打偏好、写备注。
+但先说结论：  
+正常使用时，你并不需要手动执行很多命令。  
+大多数情况下，你只需要：
 
-如果你是第一次接触这套项目，建议严格按下面顺序操作。
+1. 打开 `config.json`
+2. 填好邮箱配置
+3. 让 Codex 或安装脚本帮你把剩下的事情做好
+
+所以这份文档会分成两类内容：
+
+- `默认流程`：普通用户真正要做的
+- `备用命令`：只有在你想手测、排错或高级定制时才用
 
 ## 1. 这套项目能做什么
 
@@ -34,9 +43,11 @@
 python --version
 ```
 
-## 3. 项目里最重要的文件有哪些
+## 3. 默认流程，普通用户按这个走
 
-你最常接触的是这些文件：
+### 第 1 步：确认项目已经生成
+
+如果这是 skill 自动铺出来的项目，目录里通常会有：
 
 - `linux_do_watcher.py`
 - `config.example.json`
@@ -46,74 +57,11 @@ python --version
 - `install_tasks.ps1`
 - `doctor.ps1`
 
-运行后还会出现这些文件：
+### 第 2 步：只改 `config.json`
 
-- `state.json`
-- `watcher_runs.jsonl`
-- `last_sent_batch.json`
-- `reply_state.json`
-- `reply_actions.jsonl`
-- `saved_articles/`
-- `sent_batches/`
-
-## 4. 手动 / 自动分工先看懂
-
-### 自动完成的事
-
-这套项目默认会帮你做这些：
-
-- 定时抓取多个来源
-- 根据默认规则过滤内容
-- 跨站去重
-- 生成邮件批次号
-- 记录运行日志
-- 保存文章索引
-- 启动脚本自动清理坏掉的代理变量
-
-### 必须手动改的事
-
-这些信息涉及隐私、账号和个人选择，必须你自己确认：
-
-- 发件邮箱
-- 收件邮箱
-- SMTP 授权码
-- IMAP 相关设置
-- `allowed_senders`
-- 是否开启邮箱推送
-- 是否开启 `WxPusher`
-
-### 可以直接在 IDE 里改的事
-
-如果你想抓取更个性化的内容，不需要重装项目。
-
-直接在 IDE 里修改这些文件即可：
+真正必须你自己改的，核心就是这个文件：
 
 - `config.json`
-- `linux_do_watcher.py`
-- `install_tasks.ps1`
-
-最常见的修改包括：
-
-- 增删监控来源
-- 改关键词组
-- 改排除词
-- 改推送条数
-- 改计划任务时间
-- 改匹配逻辑
-
-## 5. 第一次怎么配置
-
-### 第 5.1 步：先生成 `config.json`
-
-如果项目里还没有 `config.json`，就把：
-
-- `config.example.json`
-
-复制成：
-
-- `config.json`
-
-### 第 5.2 步：填写邮箱配置
 
 最常见是用 QQ 邮箱发信。
 
@@ -160,7 +108,7 @@ python --version
 - `password` 不是邮箱登录密码
 - `password` 是邮箱的 SMTP 授权码
 
-### 第 5.3 步：为什么推荐两个邮箱
+### 第 3 步：推荐用两个邮箱
 
 非常推荐这样配：
 
@@ -171,83 +119,15 @@ python --version
 
 - 如果发件邮箱和收件邮箱是同一个账号，某些邮箱服务会把“自己发给自己”的邮件折叠或分类，导致你以为没有收到
 
-### 第 5.4 步：理解推送渠道
+### 第 4 步：必要时再创建计划任务
 
-默认模板里同时保留了：
-
-- `email`
-- `wxpusher`
-
-如果你只想先用邮箱：
-
-- 把 `email.enabled` 设为 `true`
-- 把 `wxpusher.enabled` 设为 `false`
-
-## 6. 默认监控哪些来源
-
-默认来源已经配好了，不用你手动加：
-
-- `linux.do`
-- `NodeSeek`
-- `V2EX`
-
-默认逻辑是：
-
-- 先从多来源抓取
-- 过滤 AI 福利相关内容
-- 做跨站去重
-- 再按站点分段发邮件
-
-## 7. 先手动测试，再上定时任务
-
-### 第 7.1 步：做干运行测试
-
-先运行：
-
-```powershell
-python .\linux_do_watcher.py --config .\config.json --dry-run
-```
-
-如果成功，你会看到：
-
-- 抓取了多少条
-- 命中了多少条
-- 这一轮预计会发什么
-- 对应的邮件批次号
-
-### 第 7.2 步：测试回复处理
-
-再运行：
-
-```powershell
-python .\linux_do_watcher.py --config .\config.json --process-replies-only
-```
-
-如果还没有新回复，出现：
-
-```text
-No new reply emails to process.
-```
-
-这是正常的。
-
-### 第 7.3 步：如果想首轮就把当前结果发出去
-
-可以运行：
-
-```powershell
-python .\linux_do_watcher.py --config .\config.json --first-run-send
-```
-
-## 8. 怎么安装定时任务
-
-确认手动测试没问题后，再运行：
+如果之前没自动创建计划任务，再运行：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 ```
 
-默认会创建两个任务：
+默认会创建：
 
 - `LinuxDoWatcher3H`
 - `LinuxDoReplyProcessor10M`
@@ -262,15 +142,80 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - 电池模式不启动
 - 如果运行中切到电池模式，会停止
 
-所以最稳的使用方式是：
+## 4. 哪些是自动完成的
 
-- 放在长期插电的电脑上跑
+这套项目默认会自动处理：
 
-## 9. 邮件收到后怎么操作
+- 多来源抓取
+- 默认规则过滤
+- 跨站去重
+- 邮件批次管理
+- 回复指令识别
+- 保存文章索引
+- 启动脚本自动清理坏掉的代理变量
 
-收到推送邮件后，不需要打开本地脚本，也不需要再手工找链接。
+所以很多命令确实不是普通用户的必做项。
 
-你可以直接回复那封邮件，在正文最前面输入指令。
+## 5. 哪些必须手动改
+
+这些必须你自己决定：
+
+- 发件邮箱
+- 收件邮箱
+- SMTP 授权码
+- IMAP 配置
+- `allowed_senders`
+- 是否开启邮箱推送
+- 是否开启 `WxPusher`
+
+## 6. 哪些可以直接在 IDE 里改
+
+如果你想抓取更个性化的内容，不需要重装项目。
+
+直接在 IDE 里改这些文件即可：
+
+- `config.json`
+- `linux_do_watcher.py`
+- `install_tasks.ps1`
+
+最常见的修改包括：
+
+- 增删监控来源
+- 改关键词组
+- 改排除词
+- 改推送条数
+- 改计划任务时间
+- 改匹配逻辑
+
+## 7. 备用命令，只在需要时手动跑
+
+### 干运行测试
+
+如果你想自己验证本轮会抓到什么，用：
+
+```powershell
+python .\linux_do_watcher.py --config .\config.json --dry-run
+```
+
+### 只测试回复处理
+
+如果你想单独验证回复邮件链路，用：
+
+```powershell
+python .\linux_do_watcher.py --config .\config.json --process-replies-only
+```
+
+### 首轮直接发送当前结果
+
+如果你希望第一次就把当前命中发出去，用：
+
+```powershell
+python .\linux_do_watcher.py --config .\config.json --first-run-send
+```
+
+## 8. 邮件收到后怎么操作
+
+收到推送邮件后，可以直接回复那封邮件，在正文最前面输入指令。
 
 ### 最常用的回复指令
 
@@ -296,7 +241,7 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - 把命令放在正文最开头
 - 不要把命令埋在一大段聊天内容后面
 
-## 10. 保存后的文章会去哪里
+## 9. 保存后的文章会去哪里
 
 保存后的文章会进：
 
@@ -308,40 +253,7 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - 更新索引
 - 让最近的内容排在最上面
 
-常见分类包括：
-
-- `offers`
-- `news`
-- `guides`
-- `tools`
-- `other`
-
-## 11. 过滤规则怎么理解
-
-当前模板已经内置了一套默认规则。
-
-它的思路不是“只要出现 AI 就推”，而是更像：
-
-- 一组词要像“福利词”
-- 另一组词要像“AI 产品词”
-- 同时命中才更容易进推送
-
-你后面如果想自己调：
-
-- 改 `filter.required_keyword_groups`
-- 改 `filter.exclude_keywords`
-- 改 `filter.max_notify_items`
-
-如果你想抓取更个性化的内容，直接在 IDE 里修改即可。
-
-最常见的改法是：
-
-- 在 `config.json` 里增删来源
-- 在 `config.json` 里改关键词组
-- 在 `config.json` 里改排除词
-- 在 `linux_do_watcher.py` 里改更细的匹配逻辑
-
-## 12. 常见排错
+## 10. 常见排错
 
 ### 情况 1：脚本报网络连接被拒绝
 
@@ -353,12 +265,10 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - `GIT_HTTP_PROXY`
 - `GIT_HTTPS_PROXY`
 
-好消息是，这套模板的两个启动脚本已经会自动清理这些常见代理变量：
+这套模板的两个启动脚本已经会自动清理这些常见代理变量：
 
 - `run_linux_do_watcher.ps1`
 - `run_linux_do_reply_processor.ps1`
-
-所以计划任务路径通常不会再因为死代理而失败。
 
 ### 情况 2：计划任务没跑
 
@@ -390,7 +300,7 @@ powershell -ExecutionPolicy Bypass -File .\doctor.ps1
 - `allowed_senders` 是否包含你的邮箱
 - 你是不是回复了原推送邮件
 
-### 情况 5：明明发送成功了，但收件箱里看不到
+### 情况 5：发送成功但收件箱里看不到
 
 优先检查是不是把发件邮箱和收件邮箱配置成了同一个账号。
 
@@ -399,7 +309,7 @@ powershell -ExecutionPolicy Bypass -File .\doctor.ps1
 - 发件邮箱：负责 SMTP 发信和 IMAP 收回复
 - 收件邮箱：负责实际接收提醒
 
-## 13. 如何看运行状态
+## 11. 如何看运行状态
 
 最常用的几个状态文件是：
 
@@ -417,34 +327,14 @@ powershell -ExecutionPolicy Bypass -File .\doctor.ps1
 - `bootstrapped`
 - `error`
 
-## 14. 如果你想把这套项目分享给别人
-
-不要直接把你自己的运行目录整包发出去。
-
-尤其不要共享这些：
-
-- `config.json`
-- `state.json`
-- `saved_articles/`
-- `sent_batches/`
-- 日志文件
-
-适合分享的是：
-
-- `config.example.json`
-- 脚本模板
-- 安装说明
-
-## 15. 推荐的第一次完整操作顺序
+## 12. 推荐的第一次完整操作顺序
 
 如果你想最稳地从零跑起来，就按这个顺序来：
 
 1. 确认 Python 正常。
 2. 复制 `config.example.json` 为 `config.json`。
 3. 填邮箱账号、SMTP 授权码、接收邮箱。
-4. 运行 `--dry-run`。
-5. 运行 `--process-replies-only`。
-6. 运行 `install_tasks.ps1`。
-7. 等第一封正式推送邮件。
-8. 直接回复邮件测试 `1` 或 `1 3 5`。
-9. 如果想抓取个性化内容，直接在 IDE 里继续改 `config.json` 和 `linux_do_watcher.py`。
+4. 如果需要，再创建计划任务。
+5. 想手测时再跑 `--dry-run`。
+6. 收到第一封推送邮件后，直接回复测试 `1` 或 `1 3 5`。
+7. 如果想抓取个性化内容，直接在 IDE 里继续改 `config.json` 和 `linux_do_watcher.py`。

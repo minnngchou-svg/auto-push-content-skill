@@ -25,8 +25,8 @@
 - Windows
 - Python
 - 最好准备两个邮箱地址
-- 这个邮箱对应的 SMTP 权限
-- 如果要处理“回复邮件”，还需要 IMAP 权限
+- 一个邮箱具备 SMTP 发信能力
+- 如果要处理“回复邮件”，这个邮箱还需要 IMAP 能力
 
 先确认 Python 正常：
 
@@ -56,9 +56,54 @@ python --version
 - `saved_articles/`
 - `sent_batches/`
 
-## 4. 第一次怎么配置
+## 4. 手动 / 自动分工先看懂
 
-### 第 4.1 步：先生成 `config.json`
+### 自动完成的事
+
+这套项目默认会帮你做这些：
+
+- 定时抓取多个来源
+- 根据默认规则过滤内容
+- 跨站去重
+- 生成邮件批次号
+- 记录运行日志
+- 保存文章索引
+- 启动脚本自动清理坏掉的代理变量
+
+### 必须手动改的事
+
+这些信息涉及隐私、账号和个人选择，必须你自己确认：
+
+- 发件邮箱
+- 收件邮箱
+- SMTP 授权码
+- IMAP 相关设置
+- `allowed_senders`
+- 是否开启邮箱推送
+- 是否开启 `WxPusher`
+
+### 可以直接在 IDE 里改的事
+
+如果你想抓取更个性化的内容，不需要重装项目。
+
+直接在 IDE 里修改这些文件即可：
+
+- `config.json`
+- `linux_do_watcher.py`
+- `install_tasks.ps1`
+
+最常见的修改包括：
+
+- 增删监控来源
+- 改关键词组
+- 改排除词
+- 改推送条数
+- 改计划任务时间
+- 改匹配逻辑
+
+## 5. 第一次怎么配置
+
+### 第 5.1 步：先生成 `config.json`
 
 如果项目里还没有 `config.json`，就把：
 
@@ -68,16 +113,9 @@ python --version
 
 - `config.json`
 
-### 第 4.2 步：填写邮箱配置
+### 第 5.2 步：填写邮箱配置
 
 最常见是用 QQ 邮箱发信。
-
-如果你想抓取个性化内容，也是直接在 IDE 里改这套项目本身，不需要重装。
-
-最常改的是：
-
-- `config.json`
-- `linux_do_watcher.py`
 
 你至少要改这些字段：
 
@@ -122,17 +160,18 @@ python --version
 - `password` 不是邮箱登录密码
 - `password` 是邮箱的 SMTP 授权码
 
-还有一个非常重要的实战建议：
+### 第 5.3 步：为什么推荐两个邮箱
 
-- 最好准备两个邮箱地址
-- 一个邮箱负责发信和接收回复
+非常推荐这样配：
+
+- 一个邮箱负责 SMTP 发信和 IMAP 读回复
 - 另一个邮箱负责接收 watcher 推送
 
 原因是：
 
 - 如果发件邮箱和收件邮箱是同一个账号，某些邮箱服务会把“自己发给自己”的邮件折叠或分类，导致你以为没有收到
 
-### 第 4.3 步：理解推送渠道
+### 第 5.4 步：理解推送渠道
 
 默认模板里同时保留了：
 
@@ -144,7 +183,7 @@ python --version
 - 把 `email.enabled` 设为 `true`
 - 把 `wxpusher.enabled` 设为 `false`
 
-## 5. 默认监控哪些来源
+## 6. 默认监控哪些来源
 
 默认来源已经配好了，不用你手动加：
 
@@ -159,9 +198,9 @@ python --version
 - 做跨站去重
 - 再按站点分段发邮件
 
-## 6. 先手动测试，再上定时任务
+## 7. 先手动测试，再上定时任务
 
-### 第 6.1 步：做干运行测试
+### 第 7.1 步：做干运行测试
 
 先运行：
 
@@ -176,7 +215,7 @@ python .\linux_do_watcher.py --config .\config.json --dry-run
 - 这一轮预计会发什么
 - 对应的邮件批次号
 
-### 第 6.2 步：测试回复处理
+### 第 7.2 步：测试回复处理
 
 再运行：
 
@@ -192,7 +231,7 @@ No new reply emails to process.
 
 这是正常的。
 
-### 第 6.3 步：如果想首轮就把当前结果发出去
+### 第 7.3 步：如果想首轮就把当前结果发出去
 
 可以运行：
 
@@ -200,7 +239,7 @@ No new reply emails to process.
 python .\linux_do_watcher.py --config .\config.json --first-run-send
 ```
 
-## 7. 怎么安装定时任务
+## 8. 怎么安装定时任务
 
 确认手动测试没问题后，再运行：
 
@@ -227,7 +266,7 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 
 - 放在长期插电的电脑上跑
 
-## 8. 邮件收到后怎么操作
+## 9. 邮件收到后怎么操作
 
 收到推送邮件后，不需要打开本地脚本，也不需要再手工找链接。
 
@@ -257,7 +296,7 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - 把命令放在正文最开头
 - 不要把命令埋在一大段聊天内容后面
 
-## 9. 保存后的文章会去哪里
+## 10. 保存后的文章会去哪里
 
 保存后的文章会进：
 
@@ -277,7 +316,7 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - `tools`
 - `other`
 
-## 10. 过滤规则怎么理解
+## 11. 过滤规则怎么理解
 
 当前模板已经内置了一套默认规则。
 
@@ -302,7 +341,7 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - 在 `config.json` 里改排除词
 - 在 `linux_do_watcher.py` 里改更细的匹配逻辑
 
-## 11. 常见排错
+## 12. 常见排错
 
 ### 情况 1：脚本报网络连接被拒绝
 
@@ -360,7 +399,7 @@ powershell -ExecutionPolicy Bypass -File .\doctor.ps1
 - 发件邮箱：负责 SMTP 发信和 IMAP 收回复
 - 收件邮箱：负责实际接收提醒
 
-## 12. 如何看运行状态
+## 13. 如何看运行状态
 
 最常用的几个状态文件是：
 
@@ -378,7 +417,7 @@ powershell -ExecutionPolicy Bypass -File .\doctor.ps1
 - `bootstrapped`
 - `error`
 
-## 13. 如果你想把这套项目分享给别人
+## 14. 如果你想把这套项目分享给别人
 
 不要直接把你自己的运行目录整包发出去。
 
@@ -396,7 +435,7 @@ powershell -ExecutionPolicy Bypass -File .\doctor.ps1
 - 脚本模板
 - 安装说明
 
-## 14. 推荐的第一次完整操作顺序
+## 15. 推荐的第一次完整操作顺序
 
 如果你想最稳地从零跑起来，就按这个顺序来：
 

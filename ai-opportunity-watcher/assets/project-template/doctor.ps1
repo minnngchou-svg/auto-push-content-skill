@@ -1,4 +1,6 @@
-﻿$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE '.codex' }
+$automationRoot = Join-Path $codexHome 'automations'
 
 Write-Host "Watcher doctor"
 Write-Host "=============="
@@ -35,11 +37,21 @@ if (Test-Path $configPath) {
   Write-Host "[WARN] config.json missing. Copy config.example.json and fill credentials first."
 }
 
-foreach ($taskName in @('LinuxDoWatcher3H', 'LinuxDoReplyProcessor10M')) {
+foreach ($automationId in @('linux-do', 'linux-do-replies')) {
+  $automationPath = Join-Path $automationRoot $automationId
+  $automationToml = Join-Path $automationPath 'automation.toml'
+  if (Test-Path $automationToml) {
+    Write-Host "[OK] Codex automation exists:" $automationId
+  } else {
+    Write-Host "[WARN] Codex automation missing:" $automationId
+  }
+}
+
+Write-Host ""
+Write-Host "Legacy Windows fallback:"
+foreach ($taskName in @('LinuxDoWatcher3H', 'LinuxDoReplyProcessor1H', 'LinuxDoReplyProcessor10M')) {
   $task = schtasks /Query /TN $taskName /V /FO LIST 2>$null
   if ($LASTEXITCODE -eq 0) {
-    Write-Host "[OK] scheduled task exists:" $taskName
-  } else {
-    Write-Host "[WARN] scheduled task missing:" $taskName
+    Write-Host "[INFO] Windows task exists:" $taskName
   }
 }

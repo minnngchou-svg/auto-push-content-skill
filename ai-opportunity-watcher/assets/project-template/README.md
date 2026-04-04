@@ -2,18 +2,19 @@
 
 这个目录里的项目，才是真正会跑起来的 watcher。
 
-但先说结论：  
-正常使用时，你并不需要手动执行很多命令。  
+先说结论：
+
+正常使用时，你并不需要手动执行很多命令。
 大多数情况下，你只需要：
 
 1. 打开 `config.json`
 2. 填好邮箱配置
-3. 让 Codex 或安装脚本帮你把剩下的事情做好
+3. 让 Codex 为当前工作区创建 2 个自动化
 
 所以这份文档会分成两类内容：
 
 - `默认流程`：普通用户真正要做的
-- `备用命令`：只有在你想手测、排错或高级定制时才用
+- `备用命令`：只有在你想手测、排错或高阶定制时才用
 
 ## 1. 这套项目能做什么
 
@@ -43,7 +44,7 @@
 python --version
 ```
 
-## 3. 默认流程，普通用户按这个走
+## 3. 默认流程，普通用户按这个来
 
 ### 第 1 步：确认项目已经生成
 
@@ -64,7 +65,6 @@ python --version
 - `config.json`
 
 最常见是用 QQ 邮箱发信。
-
 你至少要改这些字段：
 
 - `push.email.enabled`
@@ -119,28 +119,25 @@ python --version
 
 - 如果发件邮箱和收件邮箱是同一个账号，某些邮箱服务会把“自己发给自己”的邮件折叠或分类，导致你以为没有收到
 
-### 第 4 步：必要时再创建计划任务
+### 第 4 步：创建 Codex 自动化
 
-如果之前没自动创建计划任务，再运行：
+这是当前默认方案。
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
+直接在 Codex 里说：
+
+```text
+请为当前工作区创建 2 个 Codex 自动化：一个每 3 小时运行 python .\linux_do_watcher.py --config .\config.json，另一个每 1 小时运行 python .\linux_do_watcher.py --config .\config.json --process-replies-only
 ```
-
-默认会创建：
-
-- `LinuxDoWatcher3H`
-- `LinuxDoReplyProcessor10M`
 
 默认调度是：
 
-- watcher：从 `14:10` 开始，每 3 小时跑一次
-- reply processor：从 `00:00` 开始，每 10 分钟跑一次
+- watcher：每 3 小时跑一次
+- reply processor：每 1 小时跑一次
 
-默认电源策略是：
+这里有个重要说明：
 
-- 电池模式不启动
-- 如果运行中切到电池模式，会停止
+- Codex 自动化现在不支持“每 10 分钟”
+- 所以回复处理默认统一成“每 1 小时”
 
 ## 4. 哪些是自动完成的
 
@@ -153,9 +150,6 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - 回复指令识别
 - 保存文章索引
 - 启动脚本自动清理坏掉的代理变量
-- 计划任务默认以隐藏窗口运行
-
-所以很多命令确实不是普通用户的必做项。
 
 ## 5. 哪些必须手动改
 
@@ -185,8 +179,8 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - 改关键词组
 - 改排除词
 - 改推送条数
-- 改计划任务时间
 - 改匹配逻辑
+- 改备用 Windows 调度时间
 
 ## 7. 备用命令，只在需要时手动跑
 
@@ -214,7 +208,30 @@ python .\linux_do_watcher.py --config .\config.json --process-replies-only
 python .\linux_do_watcher.py --config .\config.json --first-run-send
 ```
 
-## 8. 邮件收到后怎么操作
+### 健康检查
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\doctor.ps1
+```
+
+## 8. Windows 备用方案
+
+默认不需要 Windows 计划任务。
+
+如果你明确不想用 Codex 自动化，或者以后你想把回复处理提速到更高频，再考虑运行：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
+```
+
+这个备用脚本现在会创建：
+
+- `LinuxDoWatcher3H`
+- `LinuxDoReplyProcessor1H`
+
+也就是说，就算走 Windows 备用方案，默认也已经和当前的 Codex 自动化口径对齐成“3 小时 + 1 小时”。
+
+## 9. 邮件收到后怎么操作
 
 收到推送邮件后，可以直接回复那封邮件，在正文最前面输入指令。
 
@@ -230,8 +247,8 @@ python .\linux_do_watcher.py --config .\config.json --first-run-send
 
 - `1`：保存第 1 条
 - `1 3 5`：保存第 1、3、5 条
-- `2+`：以后更偏向推类似内容
-- `3-`：以后少推类似内容
+- `2+`：以后更偏向推这类内容
+- `3-`：以后少推这类内容
 - `4 note: ...`：给第 4 条加备注
 
 ### 回复时要注意什么
@@ -242,9 +259,9 @@ python .\linux_do_watcher.py --config .\config.json --first-run-send
 - 把命令放在正文最开头
 - 不要把命令埋在一大段聊天内容后面
 
-## 9. 保存后的文章会去哪里
+## 10. 保存后的文章会去哪里
 
-保存后的文章会进：
+保存后的文章会进入：
 
 - `saved_articles/`
 
@@ -254,7 +271,7 @@ python .\linux_do_watcher.py --config .\config.json --first-run-send
 - 更新索引
 - 让最近的内容排在最上面
 
-## 10. 常见排错
+## 11. 常见排错
 
 ### 情况 1：脚本报网络连接被拒绝
 
@@ -266,20 +283,20 @@ python .\linux_do_watcher.py --config .\config.json --first-run-send
 - `GIT_HTTP_PROXY`
 - `GIT_HTTPS_PROXY`
 
-这套模板的两个启动脚本已经会自动清理这些常见代理变量：
+模板里的两个启动脚本已经会自动清理这些常见代理变量：
 
 - `run_linux_do_watcher.ps1`
 - `run_linux_do_reply_processor.ps1`
 
-### 情况 2：计划任务没跑
+### 情况 2：Codex 自动化没跑
 
 优先检查：
 
-- 电脑是不是在电池模式
-- 计划任务是不是已经创建
-- `watcher_task.log` 有没有新记录
+- Codex 自动化是不是已经创建
+- 当前工作区是不是对的
+- `watcher_runs.jsonl` 有没有新增记录
 
-可以运行：
+也可以运行：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\doctor.ps1
@@ -310,7 +327,7 @@ powershell -ExecutionPolicy Bypass -File .\doctor.ps1
 - 发件邮箱：负责 SMTP 发信和 IMAP 收回复
 - 收件邮箱：负责实际接收提醒
 
-## 11. 如何看运行状态
+## 12. 如何看运行状态
 
 最常用的几个状态文件是：
 
@@ -327,15 +344,3 @@ powershell -ExecutionPolicy Bypass -File .\doctor.ps1
 - `sent`
 - `bootstrapped`
 - `error`
-
-## 12. 推荐的第一次完整操作顺序
-
-如果你想最稳地从零跑起来，就按这个顺序来：
-
-1. 确认 Python 正常。
-2. 复制 `config.example.json` 为 `config.json`。
-3. 填邮箱账号、SMTP 授权码、接收邮箱。
-4. 如果需要，再创建计划任务。
-5. 想手测时再跑 `--dry-run`。
-6. 收到第一封推送邮件后，直接回复测试 `1` 或 `1 3 5`。
-7. 如果想抓取个性化内容，直接在 IDE 里继续改 `config.json` 和 `linux_do_watcher.py`。

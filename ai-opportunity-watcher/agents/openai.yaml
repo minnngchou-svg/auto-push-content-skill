@@ -1,6 +1,6 @@
-﻿interface:
+interface:
   display_name: "AI Opportunity Watcher"
   short_description: "Bootstrap and operate the multi-source AI opportunity watcher."
-  default_prompt: "Use $ai-opportunity-watcher to bootstrap the watcher into the current workspace, and on Windows offer to install the scheduled tasks."
+  default_prompt: "Use $ai-opportunity-watcher to bootstrap the watcher into the current workspace and create two Codex automations: watcher every 3 hours and reply processing every 1 hour."
 policy:
   allow_implicit_invocation: true

@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Copy the AI opportunity watcher template into a target workspace."""
 
 from __future__ import annotations
@@ -67,7 +67,8 @@ def main() -> int:
     print("Next steps:")
     print("1. Fill config.json with SMTP/IMAP settings and recipient email.")
     print("2. Run: python .\\linux_do_watcher.py --config .\\config.json --dry-run")
-    print("3. Run: powershell -ExecutionPolicy Bypass -File .\\install_tasks.ps1")
+    print("3. In Codex, create 2 automations for this workspace: watcher every 3 hours, replies every 1 hour.")
+    print("4. Optional legacy fallback on Windows: powershell -ExecutionPolicy Bypass -File .\\install_tasks.ps1")
     return 0
 
 

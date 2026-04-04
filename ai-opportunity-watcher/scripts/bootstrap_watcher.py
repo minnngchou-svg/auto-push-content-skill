@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Bootstrap the AI opportunity watcher into a target workspace."""
 
 from __future__ import annotations
@@ -27,7 +27,11 @@ def main() -> int:
     parser.add_argument("--target", required=True, help="Workspace directory to receive the watcher files.")
     parser.add_argument("--force", action="store_true", help="Overwrite existing template files in the target workspace.")
     parser.add_argument("--skip-config", action="store_true", help="Do not create config.json from config.example.json.")
-    parser.add_argument("--install-tasks", action="store_true", help="Install the Windows scheduled tasks after scaffolding.")
+    parser.add_argument(
+        "--install-tasks",
+        action="store_true",
+        help="Install the legacy Windows scheduled tasks after scaffolding. Codex automations are the default.",
+    )
     parser.add_argument("--skip-doctor", action="store_true", help="Skip running doctor.ps1 after scaffolding.")
     args = parser.parse_args()
 
@@ -46,12 +50,13 @@ def main() -> int:
         if os.name != "nt":
             print("Skipping task installation because install_tasks.ps1 is intended for Windows.", flush=True)
         else:
+            print("Installing legacy Windows scheduled tasks. Codex automations remain the recommended default.", flush=True)
             install_script = target_dir / "install_tasks.ps1"
             if not install_script.exists():
                 raise SystemExit(f"Missing install script: {install_script}")
             run_command(
                 ["powershell", "-ExecutionPolicy", "Bypass", "-File", str(install_script)],
-                label="Installing scheduled tasks",
+                label="Installing legacy scheduled tasks",
             )
 
     if not args.skip_doctor:
@@ -63,7 +68,7 @@ def main() -> int:
             label="Running health check",
         )
         if not args.install_tasks:
-            print("Note: missing scheduled-task warnings are expected until install_tasks.ps1 is run.", flush=True)
+            print("Note: Codex automation warnings are expected until you create the two automations in Codex.", flush=True)
 
     print("\nBootstrap complete.", flush=True)
     print(f"Workspace: {target_dir}", flush=True)
@@ -76,8 +81,16 @@ def main() -> int:
     next_step += 1
     print(f"{next_step}. Run: python .\\linux_do_watcher.py --config .\\config.json --process-replies-only", flush=True)
     next_step += 1
+    print(
+        f"{next_step}. In Codex, create 2 automations for this workspace: watcher every 3 hours, replies every 1 hour.",
+        flush=True,
+    )
+    next_step += 1
     if not args.install_tasks:
-        print(f"{next_step}. Optionally run: powershell -ExecutionPolicy Bypass -File .\\install_tasks.ps1", flush=True)
+        print(
+            f"{next_step}. Optional legacy fallback on Windows: powershell -ExecutionPolicy Bypass -File .\\install_tasks.ps1",
+            flush=True,
+        )
     return 0
 
 

@@ -1,20 +1,42 @@
-﻿# Replication Notes
+# Replication Notes
 
-## Fastest Install Path
+## Default Replication Path
 
-For a fresh workspace on Windows, the fastest path is:
+For a fresh workspace, the recommended path is:
 
-`python C:\Users\Y9000P\.codex\skills\ai-opportunity-watcher\scripts\bootstrap_watcher.py --target "<workspace>" --install-tasks`
+`python C:\Users\Y9000P\.codex\skills\ai-opportunity-watcher\scripts\bootstrap_watcher.py --target "<workspace>"`
 
-That single command will:
+That command will:
 
 - copy the watcher template into the target workspace
 - create `config.json` from `config.example.json` when it does not already exist
-- install the `LinuxDoWatcher3H` and `LinuxDoReplyProcessor10M` scheduled tasks when `--install-tasks` is included
 - run `doctor.ps1` unless `--skip-doctor` is passed
-- configure the scheduled tasks so they do not start or continue on battery power
 
-Use `scripts\scaffold_watcher.py` only when you want the files without the extra bootstrap steps.
+After bootstrap, the recommended scheduler is Codex automations:
+
+- one automation runs `python .\linux_do_watcher.py --config .\config.json` every 3 hours
+- one automation runs `python .\linux_do_watcher.py --config .\config.json --process-replies-only` every 1 hour
+
+Why hourly replies instead of every 10 minutes:
+
+- Codex automations currently support hourly intervals, not 10-minute intervals
+- to keep the project on one scheduler system, hourly reply handling is the aligned default
+
+## Optional Windows Fallback
+
+If a user explicitly wants OS-level scheduling instead of Codex automations, the template still ships with:
+
+- `install_tasks.ps1`
+
+That fallback script creates:
+
+- `LinuxDoWatcher3H`: every 3 hours from 14:10
+- `LinuxDoReplyProcessor1H`: every 1 hour from 00:00
+
+The Windows fallback also keeps:
+
+- hidden PowerShell windows
+- AC-only behavior by default
 
 ## Scaffolded Files
 
@@ -44,15 +66,7 @@ Do not copy these between users unless you explicitly want to share runtime stat
 
 ## Secret Handling
 
-Before sharing the project, replace or reset any real SMTP/IMAP secrets and keep only placeholder values in `config.example.json`.
-
-## Scheduler Defaults
-
-The bundled Windows tasks expect:
-
-- `LinuxDoWatcher3H`: every 3 hours from 14:10
-- `LinuxDoReplyProcessor10M`: every 10 minutes from 00:00
-- the task installer also keeps the default AC-only battery policy for both tasks
+Before sharing the project, replace or reset any real SMTP or IMAP secrets and keep only placeholder values in `config.example.json`.
 
 ## Proxy Safety
 

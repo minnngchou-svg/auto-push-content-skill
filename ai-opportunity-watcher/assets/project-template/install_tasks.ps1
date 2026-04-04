@@ -1,9 +1,10 @@
 param(
   [string]$WatcherTaskName = "LinuxDoWatcher3H",
-  [string]$ReplyTaskName = "LinuxDoReplyProcessor10M",
+  [string]$ReplyTaskName = "LinuxDoReplyProcessor1H",
   [string]$WatcherStartTime = "14:10",
   [int]$WatcherIntervalHours = 3,
-  [int]$ReplyIntervalMinutes = 10
+  [string]$ReplyStartTime = "00:00",
+  [int]$ReplyIntervalHours = 1
 )
 
 function Set-AcOnlyTaskSettings {
@@ -27,8 +28,12 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $watcherRunner = Join-Path $scriptDir "run_linux_do_watcher.ps1"
 $replyRunner = Join-Path $scriptDir "run_linux_do_reply_processor.ps1"
 
+Write-Host "Codex automations are now the default scheduler."
+Write-Host "This script is kept as a legacy Windows fallback."
+Write-Host ""
+
 schtasks /Create /SC HOURLY /MO $WatcherIntervalHours /ST $WatcherStartTime /TN $WatcherTaskName /TR "powershell -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$watcherRunner`"" /F | Out-Host
-schtasks /Create /SC MINUTE /MO $ReplyIntervalMinutes /ST 00:00 /TN $ReplyTaskName /TR "powershell -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$replyRunner`"" /F | Out-Host
+schtasks /Create /SC HOURLY /MO $ReplyIntervalHours /ST $ReplyStartTime /TN $ReplyTaskName /TR "powershell -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$replyRunner`"" /F | Out-Host
 Set-AcOnlyTaskSettings -TaskName $WatcherTaskName
 Set-AcOnlyTaskSettings -TaskName $ReplyTaskName
 

@@ -2,17 +2,26 @@
 
 这是一个给 Codex 用的 skill 仓库。
 
-它不是“让你手动敲一堆命令”的项目，而是一个安装器。  
-正常情况下，你只需要把 skill 装进 Codex，然后用一句话让 Codex 把 watcher 项目铺出来就够了。
+它的目标不是让朋友手动敲一堆命令，而是让朋友用一句话就在自己的工作区搭起一套“AI 白嫖 / 机会监控”系统。
+
+这套 skill 最终会帮你铺出一个 watcher 项目，它支持：
+
+- 抓取 `linux.do`
+- 抓取 `NodeSeek`
+- 抓取 `V2EX`
+- 邮件推送
+- 邮件回复指令
+- 保存文章到本地知识库
+- 结构化整理 `saved_articles/`
 
 ## 先看结论
 
-对大多数人来说，真正需要自己做的只有 4 件事：
+对大多数人来说，真正需要自己做的只有 4 步：
 
 1. 安装这个 skill
 2. 重启 Codex
-3. 让 Codex 在当前工作区安装 watcher
-4. 打开 `config.json`，填自己的邮箱信息
+3. 对 Codex 说一句话，让它在当前工作区安装 watcher 并创建 Codex 自动化
+4. 打开 `config.json`，填自己的邮箱配置
 
 除此之外的大部分命令，都是：
 
@@ -20,20 +29,9 @@
 - 排错方案
 - 或者给维护者看的
 
-## 这套东西最后能做什么
+## 默认路径
 
-装完以后，你会得到一套 watcher 项目，它可以：
-
-- 监控 `linux.do`
-- 监控 `NodeSeek`
-- 监控 `V2EX`
-- 自动发邮件
-- 支持回复邮件执行指令
-- 自动保存文章到本地知识库
-
-## 最推荐的安装方式
-
-这是默认路径，也是最适合朋友复刻的路径。
+这是最推荐的安装方式，也是最适合朋友复刻的路径。
 
 ### 第 1 步：准备环境
 
@@ -58,52 +56,55 @@ python --version
 python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-skill-from-github.py" --repo minnngchou-svg/auto-push-content-skill --path ai-opportunity-watcher
 ```
 
-这一步会把 skill 安装到 Codex 的技能目录。
-
 ### 第 3 步：重启 Codex
 
-这一步必须做。
+这一步需要做。
 
-### 第 4 步：在 Codex 里说一句话
+### 第 4 步：让 Codex 安装 watcher 并创建自动化
 
 进入你想放项目的工作区，然后直接说：
 
 ```text
-用 $ai-opportunity-watcher 在当前工作区安装 watcher，并创建计划任务
+用 $ai-opportunity-watcher 在当前工作区安装 watcher，并创建 2 个 Codex 自动化：一个每 3 小时抓取推送，一个每 1 小时处理回复指令
 ```
 
-如果你暂时不想创建计划任务，也可以说：
+如果你暂时只想先把项目铺出来，也可以说：
 
 ```text
-用 $ai-opportunity-watcher 在当前工作区安装 watcher，但先不要创建计划任务
+用 $ai-opportunity-watcher 在当前工作区安装 watcher，但先不要创建自动化
 ```
 
 ### 第 5 步：只手动改 `config.json`
 
-正常情况下，真正需要你手动处理的核心就是这一件事：
+正常情况下，你真正必须手动处理的核心就是这一件事：
 
 - 打开生成出来的 `config.json`
-- 填好邮箱和授权码
+- 填好邮箱、授权码、IMAP 和收件地址
 
-如果你想抓取更个性化的内容，也是直接在 IDE 里改生成出来的 watcher 项目：
+如果你想抓取更个性化的内容，也是在 IDE 里直接改生成出来的 watcher 项目：
 
 - 改 `config.json`
 - 必要时改 `linux_do_watcher.py`
 
-## 哪些是自动完成的
+## 自动完成的事情
 
 默认情况下，这套 skill 会帮你自动完成：
 
 - 把 watcher 模板铺到当前工作区
-- 在缺少时生成 `config.json`
+- 在缺失时生成 `config.json`
 - 生成启动脚本
-- 生成计划任务安装脚本
 - 生成健康检查脚本
-- 可选创建计划任务
+- 提示并创建 Codex 自动化
+- 默认调度为：
+- watcher：每 3 小时一次
+- reply processor：每 1 小时一次
 - 启动脚本自动清理坏掉的代理变量
-- 计划任务默认以隐藏窗口运行
 
-所以你说得对，很多命令并不需要普通用户手动做。
+这里有一个你需要提前知道的小点：
+
+- Codex 自动化目前不支持“每 10 分钟”这种频率
+- 所以回复处理默认改成“每 1 小时一次”
+- 如果你以后一定要更快，比如 10 分钟一次，可以再手动启用 Windows 备用脚本
 
 ## 哪些必须手动改
 
@@ -112,10 +113,10 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-s
 - 发件邮箱
 - 收件邮箱
 - SMTP 授权码
-- IMAP 相关配置
+- IMAP 配置
 - `allowed_senders`
-- 你是否开启邮箱推送
-- 你是否开启 `WxPusher`
+- 是否开启邮箱推送
+- 是否开启 `WxPusher`
 
 另外非常推荐这样配：
 
@@ -124,71 +125,97 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-s
 
 因为如果发件邮箱和收件邮箱是同一个账号，某些邮箱服务会把“自己发给自己”的邮件折叠，导致看起来像没收到。
 
-## 哪些只在需要时才手动做
+## 哪些可以直接在 IDE 里改
 
-下面这些不是默认流程必做项，只有在你需要的时候才用：
+如果你想抓取更个性化的内容，不需要重装项目。
 
-### 1. 手动测试命令
+直接在 IDE 里改这些文件即可：
 
-如果你想自己验一下 watcher 状态，可以用：
+- `config.json`
+- `linux_do_watcher.py`
+- `install_tasks.ps1`
+
+最常见的修改包括：
+
+- 增删抓取来源
+- 调关键词
+- 调排除词
+- 调推送条数
+- 调匹配逻辑
+- 改备用 Windows 调度时间
+
+## 手动命令
+
+下面这些不是默认流程必做项，只有在你需要的时候才用。
+
+### 手动干运行
 
 ```powershell
 python .\linux_do_watcher.py --config .\config.json --dry-run
 ```
 
-如果你想单独验证回复处理链路，可以用：
+### 只处理回复邮件
 
 ```powershell
 python .\linux_do_watcher.py --config .\config.json --process-replies-only
 ```
 
-### 2. 手动创建计划任务
+### 首次就发送当前命中
 
-只有当你在上一步没有让 Codex 自动创建任务时，才需要自己运行：
+```powershell
+python .\linux_do_watcher.py --config .\config.json --first-run-send
+```
+
+### 健康检查
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\doctor.ps1
+```
+
+### Windows 备用方案
+
+默认不需要 Windows 计划任务。
+
+只有在你明确不想用 Codex 自动化，或者你一定要更高频回复处理时，才考虑这个备用脚本：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 ```
 
-### 3. 手动安装 skill
+这个脚本现在属于“备用方案”，不是默认安装路径。
 
-如果你已经 `git clone` 了这个仓库，也可以不用 GitHub 安装命令，直接手动复制：
+## clone 之后怎么处理
 
-- 把仓库里的 `ai-opportunity-watcher/`
-- 复制到 `%USERPROFILE%\.codex\skills\ai-opportunity-watcher`
+如果你已经 `git clone` 了这个仓库，有两种用法。
 
-复制完以后，重启 Codex 即可。
+### 普通使用者
 
-## clone 以后，`skill-creator` 该怎么理解
+普通使用者如果只是想“安装并使用这个 skill”，不需要 `$skill-creator`。
 
-这里很容易混淆，所以单独说清楚。
+普通使用者只需要：
 
-### 普通用户
+- 用 `skill-installer` 从 GitHub 安装
+- 或者手动把 `ai-opportunity-watcher/` 复制到 `%USERPROFILE%\.codex\skills\ai-opportunity-watcher`
 
-普通用户如果只是想“安装并使用这个 skill”，不需要 `$skill-creator`。
-
-普通用户只需要：
-
-- `skill-installer`
-- 或者手动复制 skill 目录
+复制完成后重启 Codex 即可。
 
 ### 维护者
 
 如果你已经 clone 了仓库，而且你想：
 
-- 修改 skill 文案
-- 修改 skill 脚本
-- 修改模板内容
+- 改 skill 文档
+- 改 skill 脚本
+- 改模板文件
 - 继续扩展这个 skill
 
-那这时候 `$skill-creator` 很有价值。
+这时候再用 `$skill-creator`。
 
 也就是说：
 
 - `skill-installer` / 手动复制：解决“怎么安装”
 - `$skill-creator`：解决“怎么维护和升级 skill”
 
-## 给朋友的最短说明
+## 最短说明
 
 如果你只想转发最短版本，发这段就够了：
 
@@ -203,13 +230,13 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-s
 4. 在 Codex 里说：
 
 ```text
-用 $ai-opportunity-watcher 在当前工作区安装 watcher，并创建计划任务
+用 $ai-opportunity-watcher 在当前工作区安装 watcher，并创建 2 个 Codex 自动化：一个每 3 小时抓取推送，一个每 1 小时处理回复指令
 ```
 
-5. 打开生成出来的 `config.json`，填邮箱账号和授权码。
-6. 如果想抓更个性化的内容，直接在 IDE 里改 `config.json` 或 `linux_do_watcher.py`。
+5. 打开生成出来的 `config.json`，填邮箱账号、SMTP 授权码、IMAP 配置和收件邮箱。
+6. 如果想抓取个性化内容，直接在 IDE 里改 `config.json` 或 `linux_do_watcher.py`。
 
-## 仓库结构说明
+## 仓库结构
 
 - `ai-opportunity-watcher/`：真正发布出去的 Codex skill
 
@@ -221,9 +248,9 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-s
 - `references/`
 - `agents/`
 
-## 这个仓库不应该保存什么
+## 不要提交什么
 
-不要把这些内容推上来：
+不要把这些内容推到仓库里：
 
 - `config.json`
 - `state.json`

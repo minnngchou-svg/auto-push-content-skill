@@ -14,8 +14,8 @@ That command will:
 
 After bootstrap, the recommended scheduler is Codex automations:
 
-- one automation runs `python .\linux_do_watcher.py --config .\config.json` every 3 hours
-- one automation runs `python .\linux_do_watcher.py --config .\config.json --process-replies-only` every 1 hour
+- one automation runs `powershell -ExecutionPolicy Bypass -File .\run_linux_do_watcher.ps1` at `09:00`, `12:00`, `15:00`, `18:00`, and `21:00`
+- one automation runs `powershell -ExecutionPolicy Bypass -File .\run_linux_do_reply_processor.ps1` every hour from `09:00` through `23:00`
 
 Why hourly replies instead of every 10 minutes:
 
@@ -30,8 +30,8 @@ If a user explicitly wants OS-level scheduling instead of Codex automations, the
 
 That fallback script creates:
 
-- `LinuxDoWatcher3H`: every 3 hours from 14:10
-- `LinuxDoReplyProcessor1H`: every 1 hour from 00:00
+- `LinuxDoWatcher3H`: from `09:00` to `23:00`, every 180 minutes
+- `LinuxDoReplyProcessor1H`: from `09:00` to `23:00`, every 60 minutes
 
 The Windows fallback also keeps:
 

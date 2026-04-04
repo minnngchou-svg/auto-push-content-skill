@@ -126,18 +126,19 @@ python --version
 直接在 Codex 里说：
 
 ```text
-请为当前工作区创建 2 个 Codex 自动化：一个每 3 小时运行 python .\linux_do_watcher.py --config .\config.json，另一个每 1 小时运行 python .\linux_do_watcher.py --config .\config.json --process-replies-only
+请为当前工作区创建 2 个 Codex 自动化：一个在 09:00、12:00、15:00、18:00、21:00 运行 powershell -ExecutionPolicy Bypass -File .\run_linux_do_watcher.ps1，另一个在 09:00 到 23:00 之间每小时运行 powershell -ExecutionPolicy Bypass -File .\run_linux_do_reply_processor.ps1
 ```
 
 默认调度是：
 
-- watcher：每 3 小时跑一次
-- reply processor：每 1 小时跑一次
+- watcher：每天 `09:00 / 12:00 / 15:00 / 18:00 / 21:00`
+- reply processor：每天 `09:00-23:00` 每小时一次
 
 这里有个重要说明：
 
 - Codex 自动化现在不支持“每 10 分钟”
-- 所以回复处理默认统一成“每 1 小时”
+- 所以回复处理默认统一成“每天 09:00-23:00 每 1 小时”
+- watcher 仍然保留“白天每 3 小时一轮”的节奏，所以最后一轮是 `21:00`
 
 ## 4. 哪些是自动完成的
 
@@ -229,7 +230,10 @@ powershell -ExecutionPolicy Bypass -File .\install_tasks.ps1
 - `LinuxDoWatcher3H`
 - `LinuxDoReplyProcessor1H`
 
-也就是说，就算走 Windows 备用方案，默认也已经和当前的 Codex 自动化口径对齐成“3 小时 + 1 小时”。
+也就是说，就算走 Windows 备用方案，默认也已经和当前的 Codex 自动化口径对齐成：
+
+- watcher：每天 `09:00 / 12:00 / 15:00 / 18:00 / 21:00`
+- reply processor：每天 `09:00-23:00` 每小时一次
 
 ## 9. 邮件收到后怎么操作
 
@@ -334,8 +338,8 @@ powershell -ExecutionPolicy Bypass -File .\doctor.ps1
 - `state.json`
 - `watcher_runs.jsonl`
 - `reply_actions.jsonl`
-- `watcher_task.log`
-- `reply_task.log`
+- `watcher_task.log`（主要给 Windows 备用方案排错用）
+- `reply_task.log`（主要给 Windows 备用方案排错用）
 
 最常见的状态有：
 

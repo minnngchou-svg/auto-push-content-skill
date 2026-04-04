@@ -65,7 +65,7 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-s
 进入你想放项目的工作区，然后直接说：
 
 ```text
-用 $ai-opportunity-watcher 在当前工作区安装 watcher，并创建 2 个 Codex 自动化：一个每 3 小时抓取推送，一个每 1 小时处理回复指令
+用 $ai-opportunity-watcher 在当前工作区安装 watcher，并创建 2 个 Codex 自动化：watcher 每天在 09:00、12:00、15:00、18:00、21:00 运行；reply processor 每天 09:00 到 23:00 每小时运行一次
 ```
 
 如果你暂时只想先把项目铺出来，也可以说：
@@ -96,14 +96,15 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-s
 - 生成健康检查脚本
 - 提示并创建 Codex 自动化
 - 默认调度为：
-- watcher：每 3 小时一次
-- reply processor：每 1 小时一次
+- watcher：每天 `09:00 / 12:00 / 15:00 / 18:00 / 21:00`
+- reply processor：每天 `09:00-23:00` 每小时一次
 - 启动脚本自动清理坏掉的代理变量
 
 这里有一个你需要提前知道的小点：
 
 - Codex 自动化目前不支持“每 10 分钟”这种频率
-- 所以回复处理默认改成“每 1 小时一次”
+- 所以回复处理默认改成“每天 09:00-23:00 每 1 小时一次”
+- watcher 仍然保留“白天每 3 小时一轮”的节奏，所以最后一轮是 `21:00`
 - 如果你以后一定要更快，比如 10 分钟一次，可以再手动启用 Windows 备用脚本
 
 ## 哪些必须手动改
@@ -230,7 +231,7 @@ python "$env:USERPROFILE\.codex\skills\.system\skill-installer\scripts\install-s
 4. 在 Codex 里说：
 
 ```text
-用 $ai-opportunity-watcher 在当前工作区安装 watcher，并创建 2 个 Codex 自动化：一个每 3 小时抓取推送，一个每 1 小时处理回复指令
+用 $ai-opportunity-watcher 在当前工作区安装 watcher，并创建 2 个 Codex 自动化：watcher 每天在 09:00、12:00、15:00、18:00、21:00 运行；reply processor 每天 09:00 到 23:00 每小时运行一次
 ```
 
 5. 打开生成出来的 `config.json`，填邮箱账号、SMTP 授权码、IMAP 配置和收件邮箱。

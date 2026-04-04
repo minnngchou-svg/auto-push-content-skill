@@ -67,7 +67,7 @@ def main() -> int:
     print("Next steps:")
     print("1. Fill config.json with SMTP/IMAP settings and recipient email.")
     print("2. Run: python .\\linux_do_watcher.py --config .\\config.json --dry-run")
-    print("3. In Codex, create 2 automations for this workspace: watcher every 3 hours, replies every 1 hour.")
+    print("3. In Codex, create 2 automations for this workspace: watcher at 09:00/12:00/15:00/18:00/21:00, replies every hour from 09:00 through 23:00.")
     print("4. Optional legacy fallback on Windows: powershell -ExecutionPolicy Bypass -File .\\install_tasks.ps1")
     return 0
 

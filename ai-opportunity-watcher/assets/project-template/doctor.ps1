@@ -37,14 +37,36 @@ if (Test-Path $configPath) {
   Write-Host "[WARN] config.json missing. Copy config.example.json and fill credentials first."
 }
 
-foreach ($automationId in @('linux-do', 'linux-do-replies')) {
-  $automationPath = Join-Path $automationRoot $automationId
-  $automationToml = Join-Path $automationPath 'automation.toml'
-  if (Test-Path $automationToml) {
-    Write-Host "[OK] Codex automation exists:" $automationId
-  } else {
-    Write-Host "[WARN] Codex automation missing:" $automationId
+$escapedWorkspace = $scriptDir -replace '\\', '\\\\'
+$watcherAutomationFound = $false
+$replyAutomationFound = $false
+
+if (Test-Path $automationRoot) {
+  $automationFiles = Get-ChildItem -Path $automationRoot -Recurse -Filter 'automation.toml' -ErrorAction SilentlyContinue
+  foreach ($automationFile in $automationFiles) {
+    $content = Get-Content $automationFile.FullName -Raw -ErrorAction SilentlyContinue
+    if (-not $content) {
+      continue
+    }
+    if ($content.Contains($escapedWorkspace) -and $content.Contains('run_linux_do_watcher.ps1')) {
+      $watcherAutomationFound = $true
+    }
+    if ($content.Contains($escapedWorkspace) -and $content.Contains('run_linux_do_reply_processor.ps1')) {
+      $replyAutomationFound = $true
+    }
   }
+}
+
+if ($watcherAutomationFound) {
+  Write-Host "[OK] Codex watcher automation exists for this workspace"
+} else {
+  Write-Host "[WARN] Codex watcher automation missing for this workspace"
+}
+
+if ($replyAutomationFound) {
+  Write-Host "[OK] Codex reply automation exists for this workspace"
+} else {
+  Write-Host "[WARN] Codex reply automation missing for this workspace"
 }
 
 Write-Host ""

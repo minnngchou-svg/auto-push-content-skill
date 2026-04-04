@@ -82,7 +82,7 @@ def main() -> int:
     print(f"{next_step}. Run: python .\\linux_do_watcher.py --config .\\config.json --process-replies-only", flush=True)
     next_step += 1
     print(
-        f"{next_step}. In Codex, create 2 automations for this workspace: watcher every 3 hours, replies every 1 hour.",
+        f"{next_step}. In Codex, create 2 automations for this workspace: watcher at 09:00/12:00/15:00/18:00/21:00, replies every hour from 09:00 through 23:00.",
         flush=True,
     )
     next_step += 1

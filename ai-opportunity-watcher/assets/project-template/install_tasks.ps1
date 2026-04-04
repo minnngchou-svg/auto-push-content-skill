@@ -1,9 +1,11 @@
 param(
   [string]$WatcherTaskName = "LinuxDoWatcher3H",
   [string]$ReplyTaskName = "LinuxDoReplyProcessor1H",
-  [string]$WatcherStartTime = "14:10",
+  [string]$WatcherStartTime = "09:00",
+  [string]$WatcherEndTime = "23:00",
   [int]$WatcherIntervalHours = 3,
-  [string]$ReplyStartTime = "00:00",
+  [string]$ReplyStartTime = "09:00",
+  [string]$ReplyEndTime = "23:00",
   [int]$ReplyIntervalHours = 1
 )
 
@@ -32,8 +34,11 @@ Write-Host "Codex automations are now the default scheduler."
 Write-Host "This script is kept as a legacy Windows fallback."
 Write-Host ""
 
-schtasks /Create /SC HOURLY /MO $WatcherIntervalHours /ST $WatcherStartTime /TN $WatcherTaskName /TR "powershell -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$watcherRunner`"" /F | Out-Host
-schtasks /Create /SC HOURLY /MO $ReplyIntervalHours /ST $ReplyStartTime /TN $ReplyTaskName /TR "powershell -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$replyRunner`"" /F | Out-Host
+$watcherIntervalMinutes = $WatcherIntervalHours * 60
+$replyIntervalMinutes = $ReplyIntervalHours * 60
+
+schtasks /Create /SC MINUTE /MO $watcherIntervalMinutes /ST $WatcherStartTime /ET $WatcherEndTime /TN $WatcherTaskName /TR "powershell -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$watcherRunner`"" /F | Out-Host
+schtasks /Create /SC MINUTE /MO $replyIntervalMinutes /ST $ReplyStartTime /ET $ReplyEndTime /TN $ReplyTaskName /TR "powershell -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `"$replyRunner`"" /F | Out-Host
 Set-AcOnlyTaskSettings -TaskName $WatcherTaskName
 Set-AcOnlyTaskSettings -TaskName $ReplyTaskName
 

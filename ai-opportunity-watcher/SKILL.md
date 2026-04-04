@@ -23,8 +23,8 @@ That command:
 
 After scaffolding, the default automation flow is:
 
-- create one Codex automation that runs `python .\linux_do_watcher.py --config .\config.json` every 3 hours
-- create one Codex automation that runs `python .\linux_do_watcher.py --config .\config.json --process-replies-only` every 1 hour
+- create one Codex automation that runs `powershell -ExecutionPolicy Bypass -File .\run_linux_do_watcher.ps1` at `09:00`, `12:00`, `15:00`, `18:00`, and `21:00`
+- create one Codex automation that runs `powershell -ExecutionPolicy Bypass -File .\run_linux_do_reply_processor.ps1` every hour from `09:00` through `23:00`
 
 If the user explicitly wants OS-level scheduling instead, `install_tasks.ps1` remains available as a Windows fallback.
 
@@ -39,8 +39,8 @@ If the user explicitly wants OS-level scheduling instead, `install_tasks.ps1` re
    - Set the recipient email.
    - Adjust sources, filters, and reply-processing settings if needed.
 3. Create the Codex automations unless the user explicitly asked for another scheduler.
-   - watcher: every 3 hours
-   - reply processor: every 1 hour
+   - watcher: `09:00 / 12:00 / 15:00 / 18:00 / 21:00`
+   - reply processor: every hour from `09:00` through `23:00`
    - mention that Codex automations currently do not support every-10-minute schedules, so hourly reply handling is the aligned default
 4. Validate from the target workspace when the user wants a manual sanity check.
    - `python .\linux_do_watcher.py --config .\config.json --dry-run`
